@@ -10,18 +10,23 @@ const connection = mysql.createConnection({
   database: process.env.MySQLDBname,
 });
 
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // 모든 출처 허용
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 connection.connect();
 
-connection.query("SELECT * from topic", (error, rows, fields) => {
+connection.query("SELECT author FROM topic WHERE author='jyp'", (error, rows, fields) => {
   if (error) throw error;
-  console.log("User info is: ", rows);
+  console.log(rows);
+  app.get("/mysql", (req, res) => {
+    res.json({ rows: rows });
+  });
 });
 
 connection.end();
-
-app.get("/api", (req, res) => {
-  res.json({ users: ["userOne", "userTwo", "userThree"] });
-});
 
 app.listen(5500, () => {
   console.log("Server running in port 5500");
