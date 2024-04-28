@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express();
 const mysql = require("mysql");
+const path = require("path");
 require("dotenv").config();
 console.log(process.env);
 const connection = mysql.createConnection({
@@ -10,24 +11,31 @@ const connection = mysql.createConnection({
   database: process.env.MySQLDBname,
 });
 
-app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // 모든 출처 허용
-  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-  next();
-});
-
 connection.connect();
 
-connection.query("SELECT author FROM topic WHERE author='jyp'", (error, rows, fields) => {
-  if (error) throw error;
-  console.log(rows);
-  app.get("/mysql", (req, res) => {
-    res.json({ rows: rows });
+app.get("/api/mysql", (req, res) => {
+  console.log("API 요청 받음");
+  connection.query("SELECT description FROM topic WHERE author='jyp'", (error, rows, fields) => {
+    if (error) {
+      console.error(error);
+      res.status(500).json({ error: "Internal Server Error" });
+    } else {
+      console.log(rows);
+      res.json({ rows: rows });
+    }
   });
 });
 
-connection.end();
+app.get("/api/hi", (req, res) => {
+  res.json({ rows: "answer" });
+});
+
+app.use(express.static(path.join(__dirname, "../client/build")));
+
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "../client/build", "index.html"));
+});
 
 app.listen(5500, () => {
-  console.log("Server running in port 5500");
+  console.log("Server running in poort 5500");
 });
