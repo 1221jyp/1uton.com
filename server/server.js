@@ -1,17 +1,9 @@
 const express = require("express");
 const app = express();
-const mysql = require("mysql");
 const path = require("path");
+const connection = require("./db");
 require("dotenv").config();
 console.log(process.env);
-const connection = mysql.createConnection({
-  host: "www.1uton.com",
-  user: process.env.MySQLId,
-  password: process.env.MySQLPassword,
-  database: process.env.MySQLDBname,
-});
-
-connection.connect();
 
 app.get("/api/mysql", (req, res) => {
   console.log("API 요청 받음");
