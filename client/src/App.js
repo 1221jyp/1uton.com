@@ -14,7 +14,7 @@ function App() {
 
   return (
     <div>
-      <div>react정상 작동중</div>
+      <div>react정상 작동중입니다.</div>
       {backendData2.map((item, index) => (
         <div key={index}>{item.description}</div>
       ))}

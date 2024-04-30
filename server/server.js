@@ -29,5 +29,5 @@ app.get("/", (req, res) => {
 });
 
 app.listen(5500, () => {
-  console.log("Server running in poort 5500");
+  console.log("Server running in port 5500");
 });
