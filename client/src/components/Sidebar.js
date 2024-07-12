@@ -28,7 +28,7 @@ const Sidebar = () => {
           <nav class="grid items-start px-4 text-sm font-medium">
             <a
               class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900"
-              href="#"
+              href="/"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -51,7 +51,7 @@ const Sidebar = () => {
             </a>
             <a
               class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900"
-              href="#"
+              href="/newpost"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -73,7 +73,7 @@ const Sidebar = () => {
             </a>
             <a
               class="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900"
-              href="#"
+              href="/timestamp"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"

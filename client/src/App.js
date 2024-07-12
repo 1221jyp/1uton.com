@@ -1,18 +1,25 @@
 import "/Users/jyp/Documents/GitHub/expressjs-react/client/src/index.css";
-import { List, Batsal, Sidebar, Header } from "./components/Export.js";
+import { Sidebar, Header } from "./components/Export";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Schedule from "./Schedule";
+import Timestamp from "./TimeStamp";
+import Newpost from "./Newpost";
 
 function App() {
   return (
-    <div class="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
-      <Sidebar></Sidebar>
-      <div class="flex flex-col">
-        <Header></Header>
-        <main class="flex-1 flex flex-col gap-4 p-4 md:gap-8 md:p-6">
-          <Batsal></Batsal>
-          <List></List>
-        </main>
+    <Router>
+      <div className="grid min-h-screen w-full lg:grid-cols-[280px_1fr]">
+        <Sidebar />
+        <div className="flex flex-col">
+          <Header />
+          <Routes>
+            <Route path="/" element={<Schedule />} />
+            <Route path="/timestamp" element={<Timestamp />} />
+            <Route path="/newpost" element={<Newpost />} />
+          </Routes>
+        </div>
       </div>
-    </div>
+    </Router>
   );
 }
 
