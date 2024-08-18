@@ -10,5 +10,6 @@ npm run build
 
 
 echo "build된 폴더를 전송합니다."
-rsync -avz -e "ssh -p 3323" build/ qkrwldbf@1uton.com:/var/www/client/build
+rsync -avz -e "ssh -i ~/.ssh/1221jyp -p 3323" build/ qkrwldbf@1uton.com:/var/www/client/build
+
 

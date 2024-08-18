@@ -18,6 +18,7 @@ function Newpost() {
     });
   };
 
+  //Newpost.js
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { subject, title, description, startDate, endDate } = formData;
@@ -53,6 +54,7 @@ function Newpost() {
       console.error("폼 제출 실패:", error);
     }
   };
+
   return (
     <form onSubmit={handleSubmit} className="w-full p-4 bg-white shadow-md rounded ">
       <h2 className="text-2xl font-bold mb-4">새 글 작성</h2>

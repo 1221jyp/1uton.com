@@ -1,14 +1,38 @@
+//express 모듈들을 불러오기
 const express = require("express");
 const app = express();
+const session = require("express-session");
+//path 모듈을 불러오기
 const path = require("path");
+//db 모듈을 불러오기
 const connection = require("./db");
-const cors = require("cors");
+//body-parser 모듈을 불러오기
 const bodyParser = require("body-parser");
+//분리해놓은 파일들 불러오기
+const passport = require("./services/passport");
+const authRoutes = require("./services/auth");
+const apiRoutes = require("./services/routes");
+//dotenv 모듈을 불러오기
+require("dotenv").config();
 
-app.use(cors());
+//body-parser 설정
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-require("dotenv").config();
+
+// 세션 설정
+app.use(
+  session({
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: true }, // HTTPS를 사용하는 경우에만 설정
+  })
+);
+
+// passport.js
+app.use(passport.initialize());
+app.use(passport.session());
+
 console.log(process.env);
 
 connection.connect((err) => {
@@ -19,37 +43,11 @@ connection.connect((err) => {
   console.log("데이터베이스 연결 성공.");
 });
 
-app.get("/api/pa", (req, res) => {
-  console.log("API 요청 받음");
-  connection.query("SELECT * FROM PA", (error, rows, fields) => {
-    if (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
-    } else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
-});
+// auth.js
+app.use("/auth", authRoutes);
 
-app.post("/api/post", (req, res) => {
-  const formData = req.body;
-  console.log("Received form data:", formData);
-  const { subject, title, description, startDate, endDate, referenceLink } = formData;
-  const query =
-    "INSERT INTO PA (subject, title, description, start_date, end_date, reference_link, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
-  const values = [subject, title, description, startDate, endDate, referenceLink];
-
-  connection.query(query, values, (error, result) => {
-    if (error) {
-      console.error(error);
-      res.status(500).json({ error: "Internal Server Error" });
-    } else {
-      console.log("데이터 저장 성공:", result);
-      res.status(200).json({ message: "Data saved successfully" });
-    }
-  });
-});
+// routes.js
+app.use("/", apiRoutes);
 
 app.use(express.static(path.join(__dirname, "../client/build")));
 
