@@ -5,13 +5,13 @@ const connection = require("../db");
 // GET 라우트
 router.get("/api/pa", (req, res) => {
   console.log("API 요청 받음");
-  connection.query("SELECT * FROM PA", (error, rows, fields) => {
+  connection.query("SELECT * FROM PA", (error, result) => {
     if (error) {
       console.error(error);
       res.status(500).json({ error: "Internal Server Error" });
     } else {
-      console.log(rows);
-      res.json(rows);
+      console.log(result.rows);
+      res.json(result.rows);
     }
   });
 });
@@ -22,7 +22,7 @@ router.post("/api/post", (req, res) => {
   console.log("Received form data:", formData);
   const { subject, title, description, startDate, endDate, referenceLink } = formData;
   const query =
-    "INSERT INTO PA (subject, title, description, start_date, end_date, reference_link, created_at) VALUES (?, ?, ?, ?, ?, ?, NOW())";
+    "INSERT INTO PA (subject, title, description, start_date, end_date, reference_link, created_at) VALUES ($1, $2, $3, $4, $5, $6, timezone('Asia/Seoul', now()))";
   const values = [subject, title, description, startDate, endDate, referenceLink];
 
   connection.query(query, values, (error, result) => {
