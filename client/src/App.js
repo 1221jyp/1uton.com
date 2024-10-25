@@ -4,6 +4,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Schedule from "./Schedule";
 import Timestamp from "./TimeStamp";
 import Newpost from "./Newpost";
+import Meal from "./Meal";
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
             <Route path="/" element={<Schedule />} />
             <Route path="/timestamp" element={<Timestamp />} />
             <Route path="/newpost" element={<Newpost />} />
+            <Route path="/meal" element={<Meal />} />
           </Routes>
         </div>
       </div>
