@@ -1,18 +1,145 @@
+// services/auth.js
 const express = require("express");
-const passport = require("passport");
+const axios = require("axios");
+const connection = require("../db");
 const router = express.Router();
+require("dotenv").config();
 
-// Google OAuth 인증 라우트
-router.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const GOOGLE_LOGIN_REDIRECT_URI = process.env.GOOGLE_LOGIN_REDIRECT_URI;
+const GOOGLE_SIGNUP_REDIRECT_URI = process.env.GOOGLE_SIGNUP_REDIRECT_URI;
+const GOOGLE_TOKEN_URL = "https://oauth2.googleapis.com/token";
+const GOOGLE_USERINFO_URL = "https://www.googleapis.com/oauth2/v2/userinfo";
 
-// Google OAuth 콜백 라우트
-router.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  function (req, res) {
-    // 성공적인 인증 후 리다이렉트할 경로
-    res.redirect("/");
+// 로그인 기능
+router.get("/login", (req, res) => {
+  let url = "https://accounts.google.com/o/oauth2/v2/auth";
+  url += `?client_id=${GOOGLE_CLIENT_ID}`;
+  url += `&redirect_uri=${GOOGLE_LOGIN_REDIRECT_URI}`;
+  url += "&response_type=code";
+  url += "&scope=email profile";
+  res.redirect(url);
+});
+
+router.get("/signup", (req, res) => {
+  let url = "https://accounts.google.com/o/oauth2/v2/auth";
+  url += `?client_id=${GOOGLE_CLIENT_ID}`;
+  url += `&redirect_uri=${GOOGLE_SIGNUP_REDIRECT_URI}`;
+  url += "&response_type=code";
+  url += "&scope=email profile";
+  res.redirect(url);
+});
+
+// 리다이렉트 주소 설정
+router.get("/login/redirect", async (req, res) => {
+  const { code } = req.query;
+  console.log(`code: ${code}`);
+
+  try {
+    // access_token 가져오기
+    const resp = await axios.post(GOOGLE_TOKEN_URL, {
+      code,
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      redirect_uri: GOOGLE_LOGIN_REDIRECT_URI,
+      grant_type: "authorization_code",
+    });
+
+    // 사용자 정보 가져오기
+    const resp2 = await axios.get(GOOGLE_USERINFO_URL, {
+      headers: {
+        Authorization: `Bearer ${resp.data.access_token}`,
+      },
+    });
+
+    const { id: googleId, email, name, picture } = resp2.data;
+
+    // DB에 사용자 정보 저장
+    const query =
+      "INSERT INTO users (id, email, name, picture) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO NOTHING";
+    const values = [googleId, email, name, picture];
+
+    connection.query(query, values, (error) => {
+      if (error) {
+        console.error("로그인 DB 저장 오류:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+
+      // 세션에 사용자 정보 저장
+      req.session.user = { id: googleId, email, name, picture };
+      console.log("세션에 저장된 사용자 정보:", req.session.user);
+      console.log("세션에 저장된 사용자 정보:", req.session); // 로그 추가
+
+      // 로그인 후 / 주소로 리다이렉트
+      res.redirect("/");
+    });
+  } catch (error) {
+    console.error("로그인 오류:", error);
+    res.status(500).send("Internal Server Error");
   }
-);
+});
+
+// 회원가입 리다이렉트 처리
+router.get("/signup/redirect", async (req, res) => {
+  const { code } = req.query;
+
+  try {
+    // access_token 가져오기
+    const resp = await axios.post(GOOGLE_TOKEN_URL, {
+      code,
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      redirect_uri: GOOGLE_SIGNUP_REDIRECT_URI,
+      grant_type: "authorization_code",
+    });
+
+    // 사용자 정보 가져오기
+    const resp2 = await axios.get(GOOGLE_USERINFO_URL, {
+      headers: {
+        Authorization: `Bearer ${resp.data.access_token}`,
+      },
+    });
+
+    const { id: googleId, email, name, picture } = resp2.data; // 프로필 사진 URL을 가져옴
+
+    // DB에 사용자 정보 저장
+    const query =
+      "INSERT INTO users (id, email, name, picture) VALUES ($1, $2, $3, $4) ON CONFLICT (id) DO NOTHING";
+    const values = [googleId, email, name, picture];
+
+    connection.query(query, values, (error) => {
+      if (error) {
+        console.error("회원가입 DB 저장 오류:", error);
+        return res.status(500).send("Internal Server Error");
+      }
+      // 성공적으로 저장된 경우 사용자 정보 반환
+      res.json(resp2.data);
+    });
+  } catch (error) {
+    console.error("회원가입 오류:", error);
+    res.status(500).send("Internal Server Error");
+  }
+});
+
+// 로그인 상태 확인
+router.get("/api/check-login", (req, res) => {
+  console.log("함수안에서", req.session.user);
+  if (req.session && req.session.user) {
+    res.json({ loggedIn: true });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+// 로그아웃 처리
+router.post("/api/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).send("로그아웃 실패");
+    }
+    res.send("로그아웃 성공");
+  });
+});
 
 module.exports = router;

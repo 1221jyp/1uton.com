@@ -1,55 +1,30 @@
-//express 모듈들을 불러오기
+// server.js
 const express = require("express");
 const app = express();
-const session = require("express-session");
-//path 모듈을 불러오기
 const path = require("path");
-//db 모듈을 불러오기
-const connection = require("./db");
-//body-parser 모듈을 불러오기
 const bodyParser = require("body-parser");
-//분리해놓은 파일들 불러오기
-const passport = require("./services/passport");
-const authRoutes = require("./services/auth");
 const apiRoutes = require("./services/routes");
-//dotenv 모듈을 불러오기
+const authRoutes = require("./services/auth"); // auth.js 추가
+const cookieParser = require("cookie-parser");
+const sessionMiddleware = require("./services/session");
+
 require("dotenv").config();
 
-//body-parser 설정
+app.use(cookieParser("secret"));
+
+app.use(sessionMiddleware);
+
+// body-parser 설정
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// 세션 설정
-app.use(
-  session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: true }, // HTTPS를 사용하는 경우에만 설정
-  })
-);
+// 로그인 및 회원가입 라우트 설정
+app.use("/", authRoutes); // auth.js에서 정의한 라우트를 사용
 
-// passport.js
-app.use(passport.initialize());
-app.use(passport.session());
-
-console.log(process.env);
-
-connection.connect((err, client, release) => {
-  if (err) {
-    console.error("데이터베이스 연결 실패: " + err.stack);
-    return;
-  }
-  console.log("데이터베이스 연결 성공.");
-  release();
-});
-
-// auth.js
-app.use("/auth", authRoutes);
-
-// routes.js
+// 기존의 apiRoutes 설정
 app.use("/", apiRoutes);
 
+// 정적 파일 제공
 app.use(express.static(path.join(__dirname, "../client/build")));
 
 app.get("*", (req, res) => {
