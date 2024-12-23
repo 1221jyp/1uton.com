@@ -1,5 +1,6 @@
 import "/Users/jyp/Documents/GitHub/expressjs-react/client/src/index.css";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import axios from "axios";
 
 function Newpost() {
   const [formData, setFormData] = useState({
@@ -18,9 +19,33 @@ function Newpost() {
     });
   };
 
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    // 로그인 상태 확인 API 호출
+    const checkLoginStatus = async () => {
+      try {
+        const response = await axios.get("/api/check-login");
+        console.log("로그인 상태 응답:", response.data); // 응답 로그 추가
+        setIsLoggedIn(response.data.loggedIn);
+      } catch (error) {
+        console.error("로그인 상태 확인 오류:", error);
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
   //Newpost.js
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    // 로그인하지 않은 경우 알림 표시
+    if (!isLoggedIn) {
+      alert("로그인 후에 게시물을 작성할 수 있습니다.");
+      return;
+    }
+
     const { subject, title, description, startDate, endDate } = formData;
     if (
       subject.trim() === "" ||

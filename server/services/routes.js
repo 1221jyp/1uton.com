@@ -19,12 +19,13 @@ router.get("/api/pa", (req, res) => {
 
 // POST 라우트
 router.post("/api/post", (req, res) => {
+  const userName = req.session.user.name;
   const formData = req.body;
   console.log("Received form data:", formData);
   const { subject, title, description, startDate, endDate, referenceLink } = formData;
   const query =
-    "INSERT INTO PA (subject, title, description, start_date, end_date, reference_link, created_at) VALUES ($1, $2, $3, $4, $5, $6, timezone('Asia/Seoul', now()))";
-  const values = [subject, title, description, startDate, endDate, referenceLink];
+    "INSERT INTO PA (subject, title, description, start_date, end_date, reference_link, author, created_at) VALUES ($1, $2, $3, $4, $5, $6, $7, timezone('Asia/Seoul', now()))";
+  const values = [subject, title, description, startDate, endDate, referenceLink, userName];
 
   connection.query(query, values, (error, result) => {
     if (error) {

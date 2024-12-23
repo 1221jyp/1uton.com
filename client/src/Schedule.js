@@ -9,5 +9,4 @@ function Schedule() {
     </main>
   );
 }
-
 export default Schedule;
