@@ -71,7 +71,7 @@ const Sidebar = () => {
               </svg>
               글 작성
             </a>
-            <a
+            {/* <a
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900"
               href="/timestamp"
             >
@@ -91,7 +91,7 @@ const Sidebar = () => {
                 <polyline points="12 6 12 12 16 14"></polyline>
               </svg>
               타임스탬프
-            </a>
+            </a> */}
             {/* 오늘의 급식 버튼 수정 */}
             <a
               className="flex items-center gap-3 rounded-lg px-3 py-2 text-gray-500 transition-all hover:text-gray-900"

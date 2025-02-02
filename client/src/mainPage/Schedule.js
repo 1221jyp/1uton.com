@@ -1,5 +1,5 @@
 import "/Users/jyp/Documents/GitHub/expressjs-react/client/src/index.css";
-import { List, Batsal, Sidebar, Header } from "./components/Export";
+import { Batsal } from "../components/Export";
 
 function Schedule() {
   return (

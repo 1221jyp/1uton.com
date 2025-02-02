@@ -1,10 +1,10 @@
 import "/Users/jyp/Documents/GitHub/expressjs-react/client/src/index.css";
 import { Sidebar, Header } from "./components/Export";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Schedule from "./Schedule";
-import Timestamp from "./TimeStamp";
-import Newpost from "./Newpost";
-import Meal from "./Meal";
+import Schedule from "./mainPage/Schedule";
+import Timestamp from "./mainPage/TimeStamp";
+import Newpost from "./mainPage/Newpost";
+import Meal from "./mainPage/Meal";
 
 function App() {
   return (
@@ -15,7 +15,7 @@ function App() {
           <Header />
           <Routes>
             <Route path="/" element={<Schedule />} />
-            <Route path="/timestamp" element={<Timestamp />} />
+            {/* <Route path="/timestamp" element={<Timestamp />} /> */}
             <Route path="/newpost" element={<Newpost />} />
             <Route path="/meal" element={<Meal />} />
           </Routes>
