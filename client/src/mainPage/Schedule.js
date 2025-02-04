@@ -1,4 +1,4 @@
-import "/Users/jyp/Documents/GitHub/expressjs-react/client/src/index.css";
+import "../index.css"; //무조건 상대경로로 지정 (그렇지 않으면 도커에서 빌드시 오류 발생)
 import { Batsal } from "../components/Export";
 
 function Schedule() {

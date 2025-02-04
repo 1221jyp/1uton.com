@@ -1,6 +1,11 @@
 // db.js
 const { Pool } = require("pg");
-require("dotenv").config();
+
+//env 환경변수 가져오기
+const path = require("path");
+const dotenv = require("dotenv");
+const envFile = `.env.${process.env.NODE_ENV || "development"}`;
+dotenv.config({ path: path.resolve(__dirname, envFile) });
 
 const connection = new Pool({
   host: process.env.PGHOST,

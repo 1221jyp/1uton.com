@@ -3,7 +3,12 @@ const express = require("express");
 const axios = require("axios");
 const connection = require("../db");
 const router = express.Router();
-require("dotenv").config();
+
+//env 환경변수 가져오기
+const path = require("path");
+const dotenv = require("dotenv");
+const envFile = `.env.${process.env.NODE_ENV || "development"}`;
+dotenv.config({ path: path.resolve(__dirname, envFile) });
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -124,7 +129,7 @@ router.get("/signup/redirect", async (req, res) => {
 
 // 로그인 상태 확인
 router.get("/api/check-login", (req, res) => {
-  console.log("함수안에서", req.session.user);
+  console.log("로그인정보", req.session.user);
   if (req.session && req.session.user) {
     res.json({ loggedIn: true });
   } else {

@@ -1,5 +1,5 @@
 import React from "react";
-import "../index.css";
+import "../index.css"; //무조건 상대경로로 지정 (그렇지 않으면 도커에서 빌드시 오류 발생)
 
 const schedules = [
   { name: "스케줄 1", start: "2024-01-01", end: "2024-01-03" },
